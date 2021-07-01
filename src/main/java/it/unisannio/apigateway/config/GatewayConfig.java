@@ -10,8 +10,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class GatewayConfig {
 
-    @Autowired
     AuthenticationFilter filter;
+
+    @Autowired
+    public GatewayConfig(AuthenticationFilter filter) {
+        this.filter = filter;
+    }
 
     @Bean
     public RouteLocator routes(RouteLocatorBuilder builder) {
@@ -24,6 +28,10 @@ public class GatewayConfig {
                                                                 "/api/city/routes/**", "/api/city/notifications/**")
                         .filters(f -> f.filter(filter).rewritePath("/api/city/","/api/"))
                         .uri("lb://trip-service"))
+
+                .route("vehicle-service", r -> r.path( "/api/city/vehicles/**")
+                        .filters(f -> f.filter(filter).rewritePath("/api/city/","/api/"))
+                        .uri("lb://vehicle-service"))
                 .build();
     }
 

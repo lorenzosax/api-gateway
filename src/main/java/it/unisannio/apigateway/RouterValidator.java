@@ -18,7 +18,8 @@ public class RouterValidator {
 
     public static final Map<String, String> privateApiAuthority = Map.ofEntries(
             Map.entry("/api/city/trips", "ROLE_PASSENGER"),
-            Map.entry("/api/city/notifications", "ROLE_PASSENGER")
+            Map.entry("/api/city/notifications", "ROLE_PASSENGER"),
+            Map.entry("/api/city/vehicles", "ROLE_MANAGER")
     );
 
     public Predicate<ServerHttpRequest> isSecured =
