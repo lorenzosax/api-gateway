@@ -1,6 +1,5 @@
 package it.unisannio.apigateway;
 
-import io.jsonwebtoken.Claims;
 import it.unisannio.apigateway.dto.SessionDTO;
 import it.unisannio.apigateway.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,20 +13,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 
 @RefreshScope
 @Component
 public class AuthenticationFilter implements GatewayFilter {
 
     private RouterValidator routerValidator;
-    private JwtUtil jwtUtil;
     private UserService userService;
 
     @Autowired
-    public AuthenticationFilter(RouterValidator routerValidator, JwtUtil jwtUtil, UserService userService) {
+    public AuthenticationFilter(RouterValidator routerValidator, UserService userService) {
         this.routerValidator = routerValidator;
-        this.jwtUtil = jwtUtil;
         this.userService = userService;
     }
 
@@ -67,14 +63,6 @@ public class AuthenticationFilter implements GatewayFilter {
 
     private boolean isAuthMissing(ServerHttpRequest request) {
         return !request.getHeaders().containsKey("Authorization");
-    }
-
-    private void populateRequestWithHeaders(ServerWebExchange exchange, String token) {
-        Claims claims = jwtUtil.getAllClaimsFromToken(token);
-        exchange.getRequest().mutate()
-                .header("id", String.valueOf(claims.get("id")))
-                .header("role", String.valueOf(claims.get("role")))
-                .build();
     }
 
 }
