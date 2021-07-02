@@ -32,10 +32,11 @@ public class AuthenticationFilter implements GatewayFilter {
         ServerHttpRequest request = exchange.getRequest();
 
         if (routerValidator.isSecured.test(request)) {
-            if (this.isAuthMissing(request))
-                return this.onError(exchange, "Authorization header is missing in request", HttpStatus.UNAUTHORIZED);
+            final String token = this.getTokenFromRequest(request);
 
-            final String token = this.getAuthHeader(request);
+            if (token == null) {
+                return this.onError(exchange, "Authorization token is missing in request", HttpStatus.UNAUTHORIZED);
+            }
 
             SessionDTO session = userService.validateSession(token);
             if (session == null || !session.isAuthenticated())
@@ -61,8 +62,34 @@ public class AuthenticationFilter implements GatewayFilter {
         return request.getHeaders().getOrEmpty("Authorization").get(0);
     }
 
-    private boolean isAuthMissing(ServerHttpRequest request) {
+    private String getTokenFromRequest(ServerHttpRequest request) {
+        String token;
+        if (!this.isAuthHeaderMissing(request))
+            token = this.getAuthHeader(request);
+        else
+            token = this.getAuthFromWebsocket(request);
+
+        return token;
+    }
+
+    private boolean isAuthHeaderMissing(ServerHttpRequest request) {
         return !request.getHeaders().containsKey("Authorization");
+    }
+
+    private String getAuthFromWebsocket(ServerHttpRequest request) {
+        String token = null;
+        String query = request.getURI().getQuery();
+        if (query != null) {
+            String[] parameters = query.split("&");
+            for (String param : parameters) {
+                String[] p = param.split("=");
+                if (p[0].equals("token")) {
+                    token = p[1];
+                    break;
+                }
+            }
+        }
+        return token;
     }
 
 }
