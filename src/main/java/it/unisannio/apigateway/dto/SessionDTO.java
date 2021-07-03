@@ -1,16 +1,22 @@
 package it.unisannio.apigateway.dto;
 
+import it.unisannio.apigateway.Role;
+
 import java.io.Serializable;
 import java.util.List;
 
 public class SessionDTO implements Serializable {
 
     private boolean authenticated;
-    private List<String> roles;
+    private List<Role> roles;
 
     public SessionDTO() { }
 
-    public SessionDTO(boolean authenticated, List<String> roles) {
+    public SessionDTO(boolean authenticated) {
+        this.authenticated = authenticated;
+    }
+
+    public SessionDTO(boolean authenticated, List<Role> roles) {
         this.authenticated = authenticated;
         this.roles = roles;
     }
@@ -23,11 +29,11 @@ public class SessionDTO implements Serializable {
         this.authenticated = authenticated;
     }
 
-    public List<String> getRoles() {
+    public List<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<String> roles) {
+    public void setRoles(List<Role> roles) {
         this.roles = roles;
     }
 }

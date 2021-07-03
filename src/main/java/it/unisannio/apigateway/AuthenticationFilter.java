@@ -31,12 +31,15 @@ public class AuthenticationFilter implements GatewayFilter {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
 
-        if (routerValidator.isSecured.test(request)) {
+        if (routerValidator.isWebsocket.test(request)) {
+            String ticket = this.getTicketFromWebsocketRequest(request);
+            if (!userService.validateTicket(ticket))
+                return this.onError(exchange, "Websocket ticket is invalid", HttpStatus.UNAUTHORIZED);
+        } else if (routerValidator.isSecured.test(request)) {
             final String token = this.getTokenFromRequest(request);
 
-            if (token == null) {
-                return this.onError(exchange, "Authorization token is missing in request", HttpStatus.UNAUTHORIZED);
-            }
+            if (token == null)
+                return this.onError(exchange, "Authorization header is missing in request", HttpStatus.UNAUTHORIZED);
 
             SessionDTO session = userService.validateSession(token);
             if (session == null || !session.isAuthenticated())
@@ -45,7 +48,6 @@ public class AuthenticationFilter implements GatewayFilter {
             if (!routerValidator.isGranted(request.getPath().value(), session.getRoles()))
                 return this.onError(exchange, "Authorization authority is not granted", HttpStatus.UNAUTHORIZED);
 
-            // this.populateRequestWithHeaders(exchange, token);
         }
         return chain.filter(exchange);
     }
@@ -63,11 +65,9 @@ public class AuthenticationFilter implements GatewayFilter {
     }
 
     private String getTokenFromRequest(ServerHttpRequest request) {
-        String token;
+        String token = null;
         if (!this.isAuthHeaderMissing(request))
             token = this.getAuthHeader(request);
-        else
-            token = this.getAuthFromWebsocket(request);
 
         return token;
     }
@@ -76,20 +76,20 @@ public class AuthenticationFilter implements GatewayFilter {
         return !request.getHeaders().containsKey("Authorization");
     }
 
-    private String getAuthFromWebsocket(ServerHttpRequest request) {
-        String token = null;
+    private String getTicketFromWebsocketRequest(ServerHttpRequest request) {
+        String ticket = null;
         String query = request.getURI().getQuery();
         if (query != null) {
             String[] parameters = query.split("&");
             for (String param : parameters) {
                 String[] p = param.split("=");
-                if (p[0].equals("token")) {
-                    token = p[1];
+                if (p[0].equals("ticket")) {
+                    ticket = p[1];
                     break;
                 }
             }
         }
-        return token;
+        return ticket;
     }
 
 }
