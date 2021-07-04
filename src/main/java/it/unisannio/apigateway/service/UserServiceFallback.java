@@ -12,7 +12,7 @@ public class UserServiceFallback implements UserService {
     }
 
     @Override
-    public boolean validateTicket(String ott) {
+    public boolean validateTicket(String sourceIpAddress, String ott) {
         return false;
     }
 }

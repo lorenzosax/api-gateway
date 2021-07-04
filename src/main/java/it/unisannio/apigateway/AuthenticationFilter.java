@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 
 @RefreshScope
 @Component
@@ -33,7 +35,8 @@ public class AuthenticationFilter implements GatewayFilter {
 
         if (routerValidator.isWebsocket.test(request)) {
             String ticket = this.getTicketFromWebsocketRequest(request);
-            if (!userService.validateTicket(ticket))
+            String sourceIpAddress = Objects.requireNonNull(request.getRemoteAddress()).getAddress().getHostAddress();
+            if (!userService.validateTicket(sourceIpAddress, ticket))
                 return this.onError(exchange, "Websocket ticket is invalid", HttpStatus.UNAUTHORIZED);
         } else if (routerValidator.isSecured.test(request)) {
             final String token = this.getTokenFromRequest(request);

@@ -12,6 +12,6 @@ public interface UserService {
     SessionDTO validateSession(@RequestBody String token);
 
     @GetMapping("/api/tickets/{ott}/validate")
-    boolean validateTicket(@PathVariable String ott);
+    boolean validateTicket(@RequestHeader(name = "X-Forwarded-For") String sourceIpAddress, @PathVariable String ott);
 
 }
