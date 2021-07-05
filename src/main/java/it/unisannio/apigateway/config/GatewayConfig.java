@@ -24,8 +24,8 @@ public class GatewayConfig {
                         .filters(f -> f.filter(filter).rewritePath("/api/city/","/api/"))
                         .uri("lb://user-service"))
 
-                .route("trip-service", r -> r.path( "/api/city/trips/**", "/api/city/stations/**",
-                                                                "/api/city/routes/**", "/api/city/notifications/**")
+                .route("trip-service", r -> r.path("/api/city/stations/**", "/api/city/routes/**",
+                                                                "/api/city/notifications/**")
                         .filters(f -> f.filter(filter).rewritePath("/api/city/","/api/"))
                         .uri("lb://trip-service"))
 
