@@ -20,7 +20,8 @@ public class RouterValidator {
     );
 
     public static final List<String> websocketEndpoints = List.of(
-            "/api/city/notifications"
+            "/api/city/notifications",
+            "/api/city/drivers"
     );
 
     public static final Map<String, List<Role>> privateEndpointsAuthority = Map.ofEntries(
