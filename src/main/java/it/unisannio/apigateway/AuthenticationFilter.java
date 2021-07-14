@@ -45,7 +45,7 @@ public class AuthenticationFilter implements GatewayFilter {
                 return this.onError(exchange, "Authorization header is missing in request", HttpStatus.UNAUTHORIZED);
 
             SessionDTO session = userService.validateSession(token);
-            if (session == null || !session.isAuthenticated())
+            if (session == null || session.getJwt() == null)
                 return this.onError(exchange, "Authorization header is invalid", HttpStatus.UNAUTHORIZED);
 
             if (!routerValidator.isGranted(request.getPath().value(), session.getRoles()))

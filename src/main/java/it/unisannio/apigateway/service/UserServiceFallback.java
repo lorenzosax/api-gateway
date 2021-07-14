@@ -8,7 +8,7 @@ public class UserServiceFallback implements UserService {
 
     @Override
     public SessionDTO validateSession(String token) {
-        return new SessionDTO(false);
+        return null;
     }
 
     @Override
