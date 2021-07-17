@@ -23,4 +23,4 @@ EXPOSE 8080
 
 RUN chmod 777 -R /app
 
-CMD ["java", "-jar", "-Dspring-boot.run.profiles=prod", "apigateway-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "apigateway-0.0.1-SNAPSHOT.jar"]
